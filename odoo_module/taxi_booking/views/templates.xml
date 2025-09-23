@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Taxi Booking Template - Main Page -->
+        <template id="taxi_booking_template" name="Taxi Booking App">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <section class="s_website_form" data-vcss="001">
+                        <div class="container">
+                            <!-- Root container for React app -->
+                            <div id="root"></div>
+                        </div>
+                    </section>
+                </div>
+            </t>
+        </template>
+        
+        <!-- Assets Bundle for Taxi Booking App -->
+        <template id="assets_taxi_booking" name="Taxi Booking Assets">
+            <!-- CSS Assets -->
+            <link rel="stylesheet" type="text/css" href="/taxi_booking/static/taxi/assets/index.css"/>
+            
+            <!-- JS Assets -->
+            <script type="text/javascript" src="/taxi_booking/static/taxi/assets/index.js"></script>
+        </template>
+        
+        <!-- Extend Website Assets to include Taxi Booking Assets -->
+        <template id="website_assets_taxi" inherit_id="website.assets_frontend" name="Website Assets - Taxi Booking">
+            <xpath expr="." position="inside">
+                <t t-call="taxi_booking.assets_taxi_booking"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>
