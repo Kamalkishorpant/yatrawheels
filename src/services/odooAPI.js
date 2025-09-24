@@ -3,8 +3,8 @@ import { ODOO_CONFIG, ODOO_MODELS } from '../config/odooConfig'
 class OdooAPIService {
   constructor() {
     // Use direct Odoo URL in production, proxy in development
-    this.baseURL = process.env.NODE_ENV === 'production' 
-      ? 'https://yourcar.odoo.com' 
+    this.baseURL = import.meta.env.PROD 
+      ? '' // Use same origin in production (since we're served from Odoo)
       : '/api/odoo'
     this.sessionId = null
     this.isAuthenticated = false

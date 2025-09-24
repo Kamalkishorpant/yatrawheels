@@ -84,7 +84,7 @@ function App() {
   }
 
   return (
-    <Router basename={import.meta.env.PROD ? '/taxi' : '/'}>
+    <Router basename={import.meta.env.PROD ? '/shop' : '/'}>
       <div className="App">
         <Header />
         

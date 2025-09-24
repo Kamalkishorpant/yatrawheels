@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 
 class TaxiBookingController(http.Controller):
     
-    @http.route('/taxi', type='http', auth='public', website=True)
+    @http.route('/shop', type='http', auth='public', website=True)
     def taxi_booking_page(self, **kw):
         """
         Main route for the taxi booking app
@@ -16,7 +16,7 @@ class TaxiBookingController(http.Controller):
         """
         return request.render('taxi_booking.taxi_booking_template')
     
-    @http.route('/taxi/<path:path>', type='http', auth='public', website=True)
+    @http.route('/shop/<path:path>', type='http', auth='public', website=True)
     def taxi_assets(self, path, **kw):
         """
         Route for all sub-paths in the taxi booking app
