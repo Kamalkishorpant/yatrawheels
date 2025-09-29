@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useForm } from 'react-hook-form'
+import { locations } from '../data/carsData'
 import DatePicker from 'react-datepicker'
 import { X, Calendar, User, Phone, Mail, CreditCard, Check, Banknote, Smartphone } from 'lucide-react'
 import odooAPI from '../services/odooAPI'
@@ -51,12 +52,12 @@ const BookingModal = ({ car, onClose }) => {
     try {
       // Prepare booking data for Odoo
       const bookingData = {
-        name: data.name,
+        name: data.fullName || data.name,
         email: data.email,
         phone: data.phone,
         mobile: data.phone, // Using phone as mobile
         address: data.address || '',
-        pickupLocation: car.location,
+        pickupLocation: data.pickupLocation || car.location,
         dropLocation: data.dropLocation || 'To be confirmed',
         pickupDate: formatDateForOdoo(pickupDate),
         returnDate: formatDateForOdoo(returnDate),
@@ -68,6 +69,7 @@ const BookingModal = ({ car, onClose }) => {
       }
 
       // Send booking to Odoo
+      console.log('Submitting bookingData to Odoo:', bookingData)
       const result = await odooAPI.createBooking(bookingData)
       
       if (result.success) {
@@ -87,6 +89,15 @@ const BookingModal = ({ car, onClose }) => {
           onClose()
         }, 5000)
       } else {
+        // Save failed booking locally so it can be retried
+        console.warn('Booking failed, saving payload to localStorage for retry', result.error)
+        try {
+          const failed = JSON.parse(localStorage.getItem('failedBookings') || '[]')
+          failed.push({ bookingData, error: result.error, ts: Date.now() })
+          localStorage.setItem('failedBookings', JSON.stringify(failed))
+        } catch (lsErr) {
+          console.error('Failed to save booking locally:', lsErr)
+        }
         throw new Error(result.error || 'Failed to create booking in Odoo')
       }
     } catch (error) {
@@ -256,6 +267,28 @@ const BookingModal = ({ car, onClose }) => {
                     {...register('phone', { required: 'Mobile number is required' })}
                   />
                   {errors.phone && <span className="error">{errors.phone.message}</span>}
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h4>पिकअप / Drop Locations</h4>
+                <div className="form-row">
+                  <div className="form-group">
+                    <select {...register('pickupLocation')} defaultValue={car.location}>
+                      <option value="">Select pickup location</option>
+                      {locations.map((loc) => (
+                        <option key={loc} value={loc}>{loc}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <select {...register('dropLocation')}>
+                      <option value="">Select drop location</option>
+                      {locations.map((loc) => (
+                        <option key={loc} value={loc}>{loc}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 

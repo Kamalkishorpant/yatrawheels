@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YatraWheels - Taxi Booking Service</title>
+    <style>
+        /* Embedded CSS from production build */
+        @charset "UTF-8";
+        :root {
+            --primary-color: #ff6b6b;
+            --primary-dark: #e55555;
+            --secondary-color: #333;
+            --accent-color: #4ecdc4;
+            --background-light: #f8f9fa;
+            --background-dark: #2c3e50;
+            --text-dark: #2c3e50;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, .1);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, .15);
+            --border-radius: 12px;
+            --transition: all .3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), 
+                        url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1600&h=900&fit=crop') center/cover;
+            height: 90vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--white);
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,.3);
+        }
+        
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: .9;
+        }
+        
+        .search-form-container {
+            background: rgba(255,255,255,.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: .9rem;
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--text-dark);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        .search-btn {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            justify-content: center;
+            transition: var(--transition);
+            min-height: 44px;
+        }
+        
+        .search-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            margin-top: 2rem;
+        }
+        
+        .loading.show {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 15px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="root">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1>Book Your Perfect Ride</h1>
+                <p>Experience comfort and reliability with YatraWheels taxi service</p>
+                
+                <div class="search-form-container">
+                    <form class="search-form" id="booking-form">
+                        <div class="form-group">
+                            <input type="text" id="pickup" placeholder="Pickup Location" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="destination" placeholder="Destination" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="date" id="date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="time" id="time" required>
+                        </div>
+                        
+                        <button type="submit" class="search-btn">
+                            Search Cars
+                        </button>
+                    </form>
+                    
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                    </div>
+                    
+                    <div class="error-message" id="error-message">
+                        Please fill in all fields to search for available cars.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript to simulate the React app functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('booking-form');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            
+            // Set default time to current time + 1 hour
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            const timeString = now.toTimeString().slice(0, 5);
+            document.getElementById('time').value = timeString;
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const pickup = document.getElementById('pickup').value.trim();
+                const destination = document.getElementById('destination').value.trim();
+                const date = document.getElementById('date').value;
+                const time = document.getElementById('time').value;
+                
+                // Hide previous error messages
+                errorMessage.classList.remove('show');
+                
+                // Validate form
+                if (!pickup || !destination || !date || !time) {
+                    errorMessage.textContent = 'Please fill in all fields to search for available cars.';
+                    errorMessage.classList.add('show');
+                    return;
+                }
+                
+                // Show loading
+                loading.classList.add('show');
+                
+                // Simulate API call
+                setTimeout(function() {
+                    loading.classList.remove('show');
+                    alert(`Searching for cars from "${pickup}" to "${destination}" on ${date} at ${time}.\n\nThis is a demo version. In the full app, you would see available cars here.`);
+                }, 2000);
+            });
+            
+            // Add some interactivity to form fields
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = 'var(--primary-color)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.style.borderColor = '#e1e1e1';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

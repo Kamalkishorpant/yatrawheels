@@ -6,7 +6,7 @@ import FeaturedCars from './components/FeaturedCars'
 import Testimonials from './components/Testimonials'
 import Footer from './components/Footer'
 import BookingModal from './components/BookingModal'
-import DebugOdoo from './components/DebugOdoo'
+import InquiryModal from './components/InquiryModal'
 import { carsData } from './data/carsData'
 import vehicleSyncService from './services/vehicleSync'
 
@@ -15,6 +15,7 @@ function App() {
   const [filteredCars, setFilteredCars] = useState(carsData)
   const [selectedCar, setSelectedCar] = useState(null)
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [syncStatus, setSyncStatus] = useState('Using local data')
 
@@ -40,6 +41,12 @@ function App() {
     }
 
     syncVehicles()
+
+    // Show inquiry modal on first visit
+    try {
+      const shown = localStorage.getItem('inquiryShown')
+      if (!shown) setIsInquiryOpen(true)
+    } catch (e) {}
 
     // Start auto-sync
     vehicleSyncService.startAutoSync((result) => {
@@ -74,6 +81,7 @@ function App() {
   }
 
   const handleBookCar = (car) => {
+    console.log('handleBookCar invoked for car:', car)
     setSelectedCar(car)
     setIsBookingModalOpen(true)
   }
@@ -91,7 +99,7 @@ function App() {
         {/* Sync Status Indicator */}
         {isLoading && (
           <div style={{ 
-            background: '#orange', 
+            background: 'orange', 
             color: 'white', 
             padding: '8px', 
             textAlign: 'center',
@@ -109,6 +117,8 @@ function App() {
               <Testimonials />
             </>
           } />
+          <Route path="/contact" element={<React.Suspense fallback={<div>Loading...</div>}><div style={{padding:20}}><h2>Contact Us</h2></div></React.Suspense>} />
+          <Route path="/special-request" element={<React.Suspense fallback={<div>Loading...</div>}><div style={{padding:20}}><h2>Special Request</h2></div></React.Suspense>} />
         </Routes>
         <Footer />
         
@@ -118,9 +128,11 @@ function App() {
             onClose={handleCloseModal}
           />
         )}
+        {isInquiryOpen && (
+          <InquiryModal visible={isInquiryOpen} onClose={() => setIsInquiryOpen(false)} />
+        )}
         
-        {/* Debug Panel - For troubleshooting */}
-        <DebugOdoo />
+  {/* Debug Panel removed */}
       </div>
     </Router>
   )

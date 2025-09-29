@@ -75,6 +75,85 @@ const DebugOdoo = () => {
     setResults([]);
   };
 
+  // Failed bookings viewer
+  const [failedBookings, setFailedBookings] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('failedBookings') || '[]') } catch { return [] }
+  });
+
+  // Failed inquiries viewer
+  const [failedInquiries, setFailedInquiries] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('failedInquiries') || '[]') } catch { return [] }
+  });
+
+  const refreshFailed = () => {
+    try { setFailedBookings(JSON.parse(localStorage.getItem('failedBookings') || '[]')) } catch { setFailedBookings([]) }
+  }
+
+  const clearFailed = () => {
+    localStorage.removeItem('failedBookings')
+    setFailedBookings([])
+    addResult('Cleared saved failed bookings')
+  }
+
+  const refreshFailedInquiries = () => {
+    try { setFailedInquiries(JSON.parse(localStorage.getItem('failedInquiries') || '[]')) } catch { setFailedInquiries([]) }
+  }
+
+  const clearFailedInquiries = () => {
+    localStorage.removeItem('failedInquiries')
+    setFailedInquiries([])
+    addResult('Cleared saved failed inquiries')
+  }
+
+  const retryFailedInquiries = async () => {
+    if (!failedInquiries.length) return addResult('No failed inquiries to retry')
+    setIsLoading(true)
+    addResult(`Retrying ${failedInquiries.length} failed inquiries...`)
+    for (const item of failedInquiries) {
+      try {
+        const f = item.form || item
+        // find or create customer
+        let partner = null
+        if (f.email) partner = await odooAPI.findCustomer(f.email)
+        let partnerId = partner ? partner.id : null
+        if (!partnerId) {
+          const cust = await odooAPI.createCustomer({ name: f.name, email: f.email, phone: f.phone, address: f.message })
+          if (!cust.success) throw new Error(cust.error || 'createCustomer failed')
+          partnerId = cust.customerId
+        }
+        // create lead
+        const leadPayload = { name: `Website Inquiry - ${f.name || ''}`, partner_id: partnerId, email_from: f.email, phone: f.phone, mobile: f.phone, description: f.message || 'Website inquiry', type: 'lead' }
+        const leadId = await odooAPI.callOdoo('crm.lead', 'create', [leadPayload])
+        // create sale
+        const salePayload = { partner_id: partnerId, date_order: new Date().toISOString().slice(0,19).replace('T',' '), state: 'draft', note: `Website Inquiry: ${f.message || ''}` }
+        const saleId = await odooAPI.callOdoo('sale.order', 'create', [salePayload])
+        addResult(`Retried inquiry succeeded - lead:${leadId} sale:${saleId}`, 'success')
+      } catch (err) {
+        addResult(`Retry inquiry failed: ${err.message}`, 'error')
+      }
+    }
+    clearFailedInquiries()
+    setIsLoading(false)
+  }
+
+  const retryFailed = async () => {
+    if (!failedBookings.length) return addResult('No failed bookings to retry')
+    setIsLoading(true)
+    addResult(`Retrying ${failedBookings.length} failed bookings...`)
+    for (const item of failedBookings) {
+      try {
+        const res = await odooAPI.createBooking(item.bookingData)
+        if (res.success) addResult(`Retried booking success - ID: ${res.bookingId}`, 'success')
+        else addResult(`Retry failed: ${res.error}`, 'error')
+      } catch (err) {
+        addResult(`Retry threw error: ${err.message}`, 'error')
+      }
+    }
+    // After retry attempt, clear stored
+    clearFailed()
+    setIsLoading(false)
+  }
+
   return (
     <div style={{ 
       position: 'fixed', 
@@ -117,12 +196,93 @@ const DebugOdoo = () => {
           Test Customer
         </button>
         
+        <button
+          onClick={async () => {
+            setIsLoading(true);
+            addResult('🔄 Performing RAW auth fetch (prints status, headers, body)...');
+
+            try {
+              const base = import.meta.env.PROD ? (import.meta.env.VITE_ODOO_BASE_URL || '') : '/api/odoo';
+              const url = (base.endsWith('/') ? base + 'web/session/authenticate' : base + '/web/session/authenticate');
+
+              const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                  jsonrpc: '2.0',
+                  method: 'call',
+                  params: {
+                    db: (import.meta.env.VITE_ODOO_DATABASE || 'yatrawheels'),
+                    login: import.meta.env.VITE_ODOO_USER_ID || '',
+                    password: import.meta.env.VITE_ODOO_PASSWORD || ''
+                  },
+                  id: Date.now()
+                })
+              });
+
+              // Status and headers
+              addResult(`Response status: ${resp.status} ${resp.statusText}`);
+              try {
+                const headers = {};
+                resp.headers.forEach((v, k) => { headers[k] = v });
+                addResult(`Response headers: ${JSON.stringify(headers)}`);
+              } catch (hErr) {
+                addResult('Could not read response headers: ' + hErr.message, 'error');
+              }
+
+              // Try parse JSON, fallback to text
+              let bodyText = '';
+              try {
+                const json = await resp.clone().json();
+                bodyText = JSON.stringify(json, null, 2);
+                addResult(`Response JSON:\n${bodyText}`);
+              } catch (jErr) {
+                try {
+                  const text = await resp.text();
+                  addResult(`Response text:\n${text}`);
+                } catch (tErr) {
+                  addResult('Could not read response body: ' + tErr.message, 'error');
+                }
+              }
+
+            } catch (error) {
+              addResult('Raw auth fetch error: ' + (error.message || String(error)), 'error');
+            }
+
+            setIsLoading(false);
+          }}
+          disabled={isLoading}
+          style={{ margin: '5px', padding: '8px 12px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px' }}
+        >
+          Raw Auth Test
+        </button>
+        
         <button 
           onClick={clearResults}
           style={{ margin: '5px', padding: '8px 12px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px' }}
         >
           Clear
         </button>
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <h4>Saved failed bookings</h4>
+        <div style={{ maxHeight: 120, overflow: 'auto', background: '#f7f7f7', padding: 8, borderRadius: 6 }}>
+          {failedBookings.length === 0 ? (
+            <div style={{ fontSize: 12, color: '#666' }}>No saved failed bookings</div>
+          ) : failedBookings.map((fb, i) => (
+            <div key={i} style={{ marginBottom: 6, fontSize: 12 }}>
+              <div><strong>{new Date(fb.ts).toLocaleString()}</strong> — {fb.error || 'Saved'}</div>
+              <div style={{ fontSize: 11, color: '#333' }}>{fb.bookingData.name} • {fb.bookingData.phone} • ₹{fb.bookingData.totalAmount}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <button onClick={refreshFailed} style={{ marginRight: 8 }}>Refresh</button>
+          <button onClick={retryFailed} style={{ marginRight: 8 }}>Retry All</button>
+          <button onClick={clearFailed}>Clear</button>
+        </div>
       </div>
 
       <div style={{ maxHeight: '300px', overflow: 'auto' }}>

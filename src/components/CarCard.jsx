@@ -98,12 +98,16 @@ const CarCard = ({ car, onBookCar }) => {
 
         <div className="car-footer">
           <div className="price">
-            <span className="price-amount">₹{car.price * 100}</span>
-            <span className="price-period">/day</span>
+            {/* Prefer perKmRate if present */}
+            <span className="price-amount">₹{car.perKmRate ? car.perKmRate : car.price * 100}</span>
+            <span className="price-period">{car.perKmRate ? '/km' : '/day'}</span>
           </div>
           <motion.button 
             className={`book-btn ${!car.availability ? 'disabled' : ''}`}
-            onClick={() => car.availability && onBookCar(car)}
+            onClick={() => {
+              console.log('Book button clicked for car id:', car.id)
+              car.availability && onBookCar(car)
+            }}
             disabled={!car.availability}
             whileHover={car.availability ? { scale: 1.05 } : {}}
             whileTap={car.availability ? { scale: 0.95 } : {}}

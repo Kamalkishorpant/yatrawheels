@@ -1,7 +1,7 @@
 # 🚗 **Odoo Website Integration Guide**
 
 ## 📋 **Overview**
-Deploy your React Taxi Booking App directly to your Odoo website at `https://yourcar.odoo.com/taxi`
+Deploy your React Taxi Booking App directly to your Odoo website at `https://yatrawheels.odoo.com/taxi`
 
 ## 🎯 **Files Ready for Upload**
 All files in the `dist/` folder are ready for Odoo deployment:
@@ -19,7 +19,7 @@ dist/
 ### **Method 1: Website Builder (Recommended)**
 
 1. **Access Odoo Website Builder**
-   - Go to `https://yourcar.odoo.com`
+   - Go to `https://yatrawheels.odoo.com`
    - Login as Administrator
    - Go to **Website → Website Builder**
 
@@ -126,7 +126,7 @@ def taxi_page(self, **kwargs):
 ### **2. Environment Variables**
 Ensure these are set in your production environment:
 ```bash
-VITE_ODOO_URL=https://yourcar.odoo.com
+VITE_ODOO_URL=https://yatrawheels.odoo.com
 VITE_ODOO_DATABASE=yourcar
 VITE_ODOO_USERNAME=your-api-user
 VITE_ODOO_PASSWORD=your-api-password

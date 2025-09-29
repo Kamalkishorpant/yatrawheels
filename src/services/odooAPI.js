@@ -2,10 +2,13 @@ import { ODOO_CONFIG, ODOO_MODELS } from '../config/odooConfig'
 
 class OdooAPIService {
   constructor() {
-    // Use direct Odoo URL in production, proxy in development
-    this.baseURL = import.meta.env.PROD 
-      ? '' // Use same origin in production (since we're served from Odoo)
-      : '/api/odoo'
+    // In production use VITE_ODOO_BASE_URL if provided.
+    // In development always use the local proxy at /api/odoo to avoid CORS/credentials issues
+    if (import.meta.env.PROD) {
+      this.baseURL = import.meta.env.VITE_ODOO_BASE_URL || ''
+    } else {
+      this.baseURL = '/api/odoo'
+    }
     this.sessionId = null
     this.isAuthenticated = false
     this.cookies = null // Store session cookies
@@ -34,8 +37,12 @@ class OdooAPIService {
   async _performAuthentication() {
     try {
       console.log('🔐 Authenticating with Odoo...');
-      
-      const response = await fetch(`${this.baseURL}/web/session/authenticate`, {
+
+      const authUrl = this.baseURL && this.baseURL.endsWith('/')
+        ? `${this.baseURL}web/session/authenticate`
+        : `${this.baseURL}/web/session/authenticate`
+
+      const response = await fetch(authUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,8 +59,13 @@ class OdooAPIService {
           id: Math.floor(Math.random() * 1000000),
         }),
       })
-
-      const data = await response.json()
+      let data
+      try {
+        data = await response.json()
+      } catch (err) {
+        const text = await response.text().catch(() => '')
+        throw new Error(`Non-JSON auth response: ${response.status} ${response.statusText} ${text}`)
+      }
       console.log('🔗 Auth Response:', data);
       
       if (data.result && data.result.uid) {
@@ -69,7 +81,7 @@ class OdooAPIService {
         console.log('✅ Authentication successful - Session ID:', this.sessionId);
         return { success: true, userId: data.result.uid, sessionId: this.sessionId }
       } else {
-        throw new Error(data.error?.message || 'Authentication failed')
+        throw new Error(data.error?.message || data.error || 'Authentication failed')
       }
     } catch (error) {
       console.error('❌ Odoo Authentication Error:', error)
@@ -92,13 +104,17 @@ class OdooAPIService {
       const headers = {
         'Content-Type': 'application/json',
       };
-      
+
       // Add session cookie if available
       if (this.cookies) {
         headers['Cookie'] = this.cookies;
       }
 
-      const response = await fetch(`${this.baseURL}/web/dataset/call_kw`, {
+      const callUrl = this.baseURL && this.baseURL.endsWith('/')
+        ? `${this.baseURL}web/dataset/call_kw`
+        : `${this.baseURL}/web/dataset/call_kw`
+
+      const response = await fetch(callUrl, {
         method: 'POST',
         headers,
         credentials: 'include', // Important: Include cookies
@@ -115,8 +131,14 @@ class OdooAPIService {
         }),
       })
 
-      const data = await response.json()
-      
+      let data
+      try {
+        data = await response.json()
+      } catch (err) {
+        const text = await response.text().catch(() => '')
+        throw new Error(`Non-JSON API response: ${response.status} ${response.statusText} ${text}`)
+      }
+
       console.log('🔗 Odoo API Response:', data);
       
       if (data.error) {
@@ -178,7 +200,9 @@ class OdooAPIService {
       console.error('❌ Create Customer Error - Full Details:', error);
       console.error('❌ Error message:', error.message);
       console.error('❌ Customer data that failed:', customerData);
-      return { success: false, error: error.message };
+      // Include any nested error info if available
+      const extra = error.response || error.data || error.error || null
+      return { success: false, error: error.message || String(error), extra };
     }
   }
 

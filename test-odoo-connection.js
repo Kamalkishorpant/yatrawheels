@@ -3,16 +3,16 @@ async function testOdooConnection() {
   try {
     console.log('🔍 Testing Odoo Connection via Proxy...');
     
-    const response = await fetch('/api/odoo/web/session/authenticate', {
+  const response = await fetch('/api/odoo/web/session/authenticate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         jsonrpc: '2.0',
         method: 'call',
         params: {
-          db: 'yourcar',
-          login: 'kamal9@emails.emizentech.com',
-          password: 'Kartik@123',
+          db: process.env.VITE_ODOO_DATABASE || 'yatrawheels',
+          login: process.env.VITE_ODOO_USER_ID || 'kamal9@emails.emizentech.com',
+          password: process.env.VITE_ODOO_PASSWORD || 'Kartik@123',
         },
         id: 1,
       }),

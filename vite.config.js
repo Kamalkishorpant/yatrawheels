@@ -11,9 +11,13 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api/odoo': {
-        target: 'https://yourcar.odoo.com',
+  target: 'https://yatrawheels.odoo.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/odoo/, ''),
+        // Ensure cookies sent by Odoo are rewritten to the dev server origin
+        // so credentials: 'include' works in the browser during development.
+        cookieDomainRewrite: '',
+        secure: false,
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);

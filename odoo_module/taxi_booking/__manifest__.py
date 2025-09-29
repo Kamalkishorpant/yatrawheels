@@ -11,7 +11,7 @@
         - Mobile responsive design
     """,
     'author': 'YatraWheels',
-    'website': 'https://yourcar.odoo.com',
+    'website': 'https://yatrawheels.odoo.com',
     'category': 'Website',
     'depends': ['website', 'crm', 'sale'],
     'data': [

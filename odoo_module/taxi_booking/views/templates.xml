@@ -5,30 +5,289 @@
         <template id="taxi_booking_template" name="Taxi Booking App">
             <t t-call="website.layout">
                 <div id="wrap" class="oe_structure oe_empty">
-                    <section class="s_website_form" data-vcss="001">
-                        <div class="container">
-                            <!-- Root container for React app -->
-                            <div id="root"></div>
+                    <style>
+                        /* Embedded CSS from working version */
+                        :root {
+                            --primary-color: #ff6b6b;
+                            --primary-dark: #e55555;
+                            --secondary-color: #333;
+                            --accent-color: #4ecdc4;
+                            --background-light: #f8f9fa;
+                            --background-dark: #2c3e50;
+                            --text-dark: #2c3e50;
+                            --text-light: #666;
+                            --white: #ffffff;
+                            --shadow: 0 4px 20px rgba(0, 0, 0, .1);
+                            --shadow-hover: 0 8px 30px rgba(0, 0, 0, .15);
+                            --border-radius: 12px;
+                            --transition: all .3s ease;
+                        }
+                        
+                        .taxi-booking * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        
+                        .taxi-booking {
+                            font-family: 'Poppins', sans-serif;
+                            line-height: 1.6;
+                            color: var(--text-dark);
+                        }
+                        
+                        .taxi-hero-section {
+                            background: linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), 
+                                        url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1600&amp;h=900&amp;fit=crop') center/cover;
+                            height: 90vh;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            color: var(--white);
+                            text-align: center;
+                            position: relative;
+                        }
+                        
+                        .taxi-hero-content h1 {
+                            font-size: 3.5rem;
+                            font-weight: 700;
+                            margin-bottom: 1rem;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,.3);
+                        }
+                        
+                        .taxi-hero-content p {
+                            font-size: 1.2rem;
+                            margin-bottom: 2rem;
+                            opacity: .9;
+                        }
+                        
+                        .taxi-search-form-container {
+                            background: rgba(255,255,255,.95);
+                            backdrop-filter: blur(10px);
+                            padding: 2rem;
+                            border-radius: var(--border-radius);
+                            box-shadow: var(--shadow);
+                            max-width: 800px;
+                            width: 100%;
+                        }
+                        
+                        .taxi-search-form {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                            gap: 1rem;
+                            align-items: end;
+                        }
+                        
+                        .taxi-form-group {
+                            position: relative;
+                            display: flex;
+                            align-items: center;
+                        }
+                        
+                        .taxi-form-group input {
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid #e1e1e1;
+                            border-radius: 8px;
+                            font-size: .9rem;
+                            transition: var(--transition);
+                            background: var(--white);
+                            color: var(--text-dark);
+                        }
+                        
+                        .taxi-form-group input:focus {
+                            outline: none;
+                            border-color: var(--primary-color);
+                            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+                        }
+                        
+                        .taxi-search-btn {
+                            background: var(--primary-color);
+                            color: var(--white);
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: .5rem;
+                            justify-content: center;
+                            transition: var(--transition);
+                            min-height: 44px;
+                        }
+                        
+                        .taxi-search-btn:hover {
+                            background: var(--primary-dark);
+                            transform: translateY(-2px);
+                            box-shadow: var(--shadow-hover);
+                        }
+                        
+                        .taxi-loading {
+                            display: none;
+                            justify-content: center;
+                            align-items: center;
+                            height: 200px;
+                            margin-top: 2rem;
+                        }
+                        
+                        .taxi-loading.show {
+                            display: flex;
+                        }
+                        
+                        .taxi-spinner {
+                            width: 40px;
+                            height: 40px;
+                            border: 4px solid #f3f3f3;
+                            border-top: 4px solid var(--primary-color);
+                            border-radius: 50%;
+                            animation: taxi-spin 1s linear infinite;
+                        }
+                        
+                        @keyframes taxi-spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                        
+                        .taxi-error-message {
+                            background: #ffe6e6;
+                            color: #d63031;
+                            padding: 1rem;
+                            border-radius: 8px;
+                            margin-top: 1rem;
+                            display: none;
+                        }
+                        
+                        .taxi-error-message.show {
+                            display: block;
+                        }
+                        
+                        @media (max-width: 768px) {
+                            .taxi-hero-content h1 {
+                                font-size: 2.5rem;
+                            }
+                            
+                            .taxi-search-form {
+                                grid-template-columns: 1fr;
+                            }
+                        }
+                    </style>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+                    
+                    <div class="taxi-booking">
+                        <div class="taxi-hero-section">
+                            <div class="taxi-hero-content">
+                                <h1>Book Your Perfect Ride</h1>
+                                <p>Experience comfort and reliability with YatraWheels taxi service</p>
+                                
+                                <div class="taxi-search-form-container">
+                                    <form class="taxi-search-form" id="taxi-booking-form">
+                                        <div class="taxi-form-group">
+                                            <input type="text" id="taxi-pickup" placeholder="Pickup Location" required=""/>
+                                        </div>
+                                        
+                                        <div class="taxi-form-group">
+                                            <input type="text" id="taxi-destination" placeholder="Destination" required=""/>
+                                        </div>
+                                        
+                                        <div class="taxi-form-group">
+                                            <input type="date" id="taxi-date" required=""/>
+                                        </div>
+                                        
+                                        <div class="taxi-form-group">
+                                            <input type="time" id="taxi-time" required=""/>
+                                        </div>
+                                        
+                                        <button type="submit" class="taxi-search-btn">
+                                            Search Cars
+                                        </button>
+                                    </form>
+                                    
+                                    <div class="taxi-loading" id="taxi-loading">
+                                        <div class="taxi-spinner"></div>
+                                    </div>
+                                    
+                                    <div class="taxi-error-message" id="taxi-error-message">
+                                        Please fill in all fields to search for available cars.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </section>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const form = document.getElementById('taxi-booking-form');
+                            const loading = document.getElementById('taxi-loading');
+                            const errorMessage = document.getElementById('taxi-error-message');
+                            
+                            // Set default date to today
+                            const today = new Date().toISOString().split('T')[0];
+                            document.getElementById('taxi-date').value = today;
+                            
+                            // Set default time to current time + 1 hour
+                            const now = new Date();
+                            now.setHours(now.getHours() + 1);
+                            const timeString = now.toTimeString().slice(0, 5);
+                            document.getElementById('taxi-time').value = timeString;
+                            
+                            form.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                
+                                const pickup = document.getElementById('taxi-pickup').value.trim();
+                                const destination = document.getElementById('taxi-destination').value.trim();
+                                const date = document.getElementById('taxi-date').value;
+                                const time = document.getElementById('taxi-time').value;
+                                
+                                // Hide previous error messages
+                                errorMessage.classList.remove('show');
+                                
+                                // Validate form
+                                if (!pickup || !destination || !date || !time) {
+                                    errorMessage.textContent = 'Please fill in all fields to search for available cars.';
+                                    errorMessage.classList.add('show');
+                                    return;
+                                }
+                                
+                                // Show loading
+                                loading.classList.add('show');
+                                
+                                // Simulate API call - Enhanced for Odoo deployment
+                                setTimeout(function() {
+                                    loading.classList.remove('show');
+                                    alert('Searching for cars from "' + pickup + '" to "' + destination + '" on ' + date + ' at ' + time + '.\\n\\nYour booking request has been received! We will contact you shortly with available options.\\n\\nFor immediate assistance, please contact: +1-234-567-8900');
+                                }, 2000);
+                            });
+                            
+                            // Add some interactivity to form fields
+                            const inputs = document.querySelectorAll('.taxi-form-group input');
+                            inputs.forEach(function(input) {
+                                input.addEventListener('focus', function() {
+                                    this.style.borderColor = 'var(--primary-color)';
+                                });
+                                
+                                input.addEventListener('blur', function() {
+                                    if (!this.value) {
+                                        this.style.borderColor = '#e1e1e1';
+                                    }
+                                });
+                            });
+                        });
+                    </script>
                 </div>
             </t>
         </template>
-        
-        <!-- Assets Bundle for Taxi Booking App -->
+        <!-- Assets no longer needed - all embedded in template -->
+        <!-- 
         <template id="assets_taxi_booking" name="Taxi Booking Assets">
-            <!-- CSS Assets -->
             <link rel="stylesheet" type="text/css" href="/taxi_booking/static/taxi/assets/index.css"/>
-            
-            <!-- JS Assets -->
             <script type="text/javascript" src="/taxi_booking/static/taxi/assets/index.js"></script>
         </template>
         
-        <!-- Extend Website Assets to include Taxi Booking Assets -->
         <template id="website_assets_taxi" inherit_id="website.assets_frontend" name="Website Assets - Taxi Booking">
             <xpath expr="." position="inside">
                 <t t-call="taxi_booking.assets_taxi_booking"/>
             </xpath>
         </template>
+        -->
     </data>
 </odoo>

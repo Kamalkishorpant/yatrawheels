@@ -4,7 +4,7 @@ module.exports = function(app) {
   app.use(
     '/api/odoo',
     createProxyMiddleware({
-      target: 'https://yourcar.odoo.com',
+  target: 'https://yatrawheels.odoo.com',
       changeOrigin: true,
       pathRewrite: {
         '^/api/odoo': '', // Remove /api/odoo from the path

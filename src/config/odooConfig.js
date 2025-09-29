@@ -1,9 +1,8 @@
 // Odoo API Configuration
 export const ODOO_CONFIG = {
-  baseURL: import.meta.env.PROD 
-    ? '' // Use same origin in production (served from Odoo)
-    : '/api/odoo',  // Use proxy in development
-  database: 'yourcar', // Your database name
+  // Use VITE_ODOO_BASE_URL to explicitly point to Odoo. In development we default to the `/api/odoo` proxy.
+  baseURL: import.meta.env.VITE_ODOO_BASE_URL || (import.meta.env.PROD ? '' : '/api/odoo'),
+  database: import.meta.env.VITE_ODOO_DATABASE || 'yatrawheels', // Your database name
   // Note: You'll need to get these from your Odoo instance
   apiKey: import.meta.env.VITE_ODOO_API_KEY || '', // Set this in .env file
   userId: import.meta.env.VITE_ODOO_USER_ID || '', // Your user ID
