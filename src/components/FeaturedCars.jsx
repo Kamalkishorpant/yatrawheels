@@ -38,6 +38,28 @@ const FeaturedCars = ({ cars, onBookCar }) => {
           <p>All India travel के लिए best vehicles</p>
         </motion.div>
 
+        <motion.div 
+          className="charges-disclaimer"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          <div className="disclaimer-content">
+            <h4>💰 Charges Information</h4>
+            <ul>
+              <li><strong>Base Rate:</strong> Per km charges shown below (minimum 300 km billing)</li>
+              <li><strong>Night Charges:</strong> Extra 10% on base rate (10 PM - 6 AM)</li>
+              <li><strong>Toll Charges:</strong> Actual toll charges will be added to your bill</li>
+              <li><strong>Driver Allowance:</strong> ₹500 per day for outstation trips</li>
+              <li><strong>Fuel:</strong> Included in per km rate</li>
+            </ul>
+            <p className="disclaimer-note">
+              Final bill = (Distance × Per KM Rate) + Night Charges + Toll Charges + Driver Allowance
+            </p>
+          </div>
+        </motion.div>
+
         <div className="cars-controls">
           <div className="cars-count">
             <span>{sortedCars.length} taxis उपलब्ध</span>

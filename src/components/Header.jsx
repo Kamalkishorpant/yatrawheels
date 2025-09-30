@@ -16,29 +16,165 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Handle escape key and focus management
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+      // Prevent background scrolling when menu is open
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'auto'
+    }
+  }, [isMobileMenuOpen])
+
   const navItems = [
     { href: '#home', label: 'Home' },
-    { href: '#taxis', label: 'Our Fleet' },
-    { href: '#routes', label: 'Routes' },
+    { href: '#fleet', label: 'Our Fleet' },
+    { href: '#services', label: 'Services' },
     { href: '#about', label: 'About' },
     { href: '#contact', label: 'Contact' }
   ]
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
   return (
-    <motion.header 
-      className={`header ${isScrolled ? 'scrolled' : ''}`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-              <nav className="hidden md:flex space-x-8">
-          <a href="#home" className="text-gray-700 hover:text-orange-600 transition-colors">Home</a>
-          <a href="#services" className="text-gray-700 hover:text-orange-600 transition-colors">Services</a>
-          <a href="#fleet" className="text-gray-700 hover:text-orange-600 transition-colors">Our Fleet</a>
-          <a href="#about" className="text-gray-700 hover:text-orange-600 transition-colors">About</a>
-          <a href="#contact" className="text-gray-700 hover:text-orange-600 transition-colors">Contact</a>
-        </nav>
+    <>
+      {/* Skip Navigation Link for Screen Readers */}
+      <a 
+        href="#main-content" 
+        className="skip-nav"
+        onFocus={(e) => e.target.style.transform = 'translateY(0)'}
+        onBlur={(e) => e.target.style.transform = 'translateY(-100%)'}
+      >
+        Skip to main content
+      </a>
+      
+      <motion.header 
+        className={`header ${isScrolled ? 'scrolled' : ''}`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+        role="banner"
+      >
+      <nav className="nav" role="navigation" aria-label="Main navigation">
+        {/* Logo */}
+        <Link 
+          to="/" 
+          className="logo"
+          aria-label="YatraWheels - Home page"
+        >
+          <Car size={32} aria-hidden="true" />
+          <span>YatraWheels</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <ul className="nav-menu" role="menubar">
+          {navItems.map((item, index) => (
+            <li key={index} role="none">
+              <a 
+                href={item.href} 
+                className="nav-link"
+                role="menuitem"
+                aria-label={`Navigate to ${item.label} section`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    e.target.click()
+                  }
+                }}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {/* Mobile Menu Button */}
+        <button 
+          className="mobile-menu-btn"
+          onClick={toggleMobileMenu}
+          aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-navigation"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && isMobileMenuOpen) {
+              setIsMobileMenuOpen(false)
+            }
+          }}
+        >
+          {isMobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+        </button>
+
+        {/* Mobile Navigation */}
+        <motion.div 
+          id="mobile-navigation"
+          className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}
+          initial={{ opacity: 0, x: '100%' }}
+          animate={{ 
+            opacity: isMobileMenuOpen ? 1 : 0,
+            x: isMobileMenuOpen ? '0%' : '100%'
+          }}
+          transition={{ duration: 0.3 }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation menu"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setIsMobileMenuOpen(false)
+            }
+          }}
+        >
+          <ul className="mobile-nav-menu" role="menu">
+            {navItems.map((item, index) => (
+              <li key={index} role="none">
+                <a 
+                  href={item.href} 
+                  className="mobile-nav-link"
+                  role="menuitem"
+                  aria-label={`Navigate to ${item.label} section`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      e.target.click()
+                    }
+                    if (e.key === 'Tab' && index === navItems.length - 1) {
+                      // Close menu when tabbing out of last item
+                      setTimeout(() => setIsMobileMenuOpen(false), 100)
+                    }
+                  }}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div 
+            className="mobile-menu-overlay"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+      </nav>
     </motion.header>
+    </>
   )
 }
 

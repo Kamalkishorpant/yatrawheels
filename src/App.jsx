@@ -112,9 +112,11 @@ function App() {
         <Routes>
           <Route path="/" element={
             <>
-              <Hero onSearch={handleSearch} />
-              <FeaturedCars cars={filteredCars} onBookCar={handleBookCar} />
-              <Testimonials />
+              <main id="main-content">
+                <Hero onSearch={handleSearch} />
+                <FeaturedCars cars={filteredCars} onBookCar={handleBookCar} />
+                <Testimonials />
+              </main>
             </>
           } />
           <Route path="/contact" element={<React.Suspense fallback={<div>Loading...</div>}><div style={{padding:20}}><h2>Contact Us</h2></div></React.Suspense>} />
