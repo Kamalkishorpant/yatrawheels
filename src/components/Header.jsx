@@ -39,11 +39,11 @@ const Header = () => {
   }, [isMobileMenuOpen])
 
   const navItems = [
-    { href: '#home', label: 'Home' },
-    { href: '#fleet', label: 'Our Fleet' },
-    { href: '#services', label: 'Services' },
-    { href: '#about', label: 'About' },
-    { href: '#contact', label: 'Contact' }
+    { href: '/', label: 'Home' },
+    { href: '/fleet', label: 'Our Fleet' },
+    { href: '/services', label: 'Services' },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' }
   ]
 
   const toggleMobileMenu = () => {
@@ -76,7 +76,13 @@ const Header = () => {
           className="logo"
           aria-label="YatraWheels - Home page"
         >
-          <Car size={32} aria-hidden="true" />
+          <img 
+            src="/yatrawheels-logo.svg" 
+            alt="YatraWheels Logo" 
+            className="logo-image"
+            width="40" 
+            height="30" 
+          />
           <span>YatraWheels</span>
         </Link>
 
@@ -84,11 +90,11 @@ const Header = () => {
         <ul className="nav-menu" role="menubar">
           {navItems.map((item, index) => (
             <li key={index} role="none">
-              <a 
-                href={item.href} 
+              <Link
+                to={item.href} 
                 className="nav-link"
                 role="menuitem"
-                aria-label={`Navigate to ${item.label} section`}
+                aria-label={`Navigate to ${item.label} page`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
@@ -97,7 +103,7 @@ const Header = () => {
                 }}
               >
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -140,11 +146,11 @@ const Header = () => {
           <ul className="mobile-nav-menu" role="menu">
             {navItems.map((item, index) => (
               <li key={index} role="none">
-                <a 
-                  href={item.href} 
+                <Link
+                  to={item.href} 
                   className="mobile-nav-link"
                   role="menuitem"
-                  aria-label={`Navigate to ${item.label} section`}
+                  aria-label={`Navigate to ${item.label} page`}
                   onClick={() => setIsMobileMenuOpen(false)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -158,7 +164,7 @@ const Header = () => {
                   }}
                 >
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

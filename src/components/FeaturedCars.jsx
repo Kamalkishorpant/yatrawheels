@@ -62,7 +62,7 @@ const FeaturedCars = ({ cars, onBookCar }) => {
 
         <div className="cars-controls">
           <div className="cars-count">
-            <span>{sortedCars.length} taxis उपलब्ध</span>
+            <span>{sortedCars.length} cars उपलब्ध</span>
           </div>
           
           <div className="cars-actions">

@@ -1,0 +1,20 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#1e3a8a"/>
+  
+  <!-- Logo Diamond with Lightning -->
+  <g transform="translate(200, 100)">
+    <!-- Left diamond part (orange) -->
+    <path d="M-40,-30 L0,-60 L0,0 L-40,30 Z" fill="#f59e0b"/>
+    <!-- Right diamond part (yellow) -->
+    <path d="M0,-60 L40,-30 L40,30 L0,0 Z" fill="#fbbf24"/>
+    <!-- Lightning bolt -->
+    <path d="M-10,-20 L10,-40 L5,-10 L15,20 L-5,10 L-15,-20 Z" fill="#1e3a8a"/>
+  </g>
+  
+  <!-- YATRAWHEELS Text -->
+  <text x="200" y="190" font-family="Arial Black, sans-serif" font-size="32" font-weight="900" text-anchor="middle" fill="#f59e0b">YATRAWHEELS</text>
+  
+  <!-- EST. 2023 Text -->
+  <text x="200" y="220" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#fbbf24">EST. 2023</text>
+</svg>

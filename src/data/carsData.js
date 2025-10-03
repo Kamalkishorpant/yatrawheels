@@ -5,7 +5,7 @@ export const carsData = [
     model: "Dzire",
     year: 2023,
     price: 12,
-    perKmRate: 13, // ₹13/km for Dzire (treated as i20/Swift family rate)
+    perKmRate: 13, // ₹13/km for Dzire (treated as Etios/Swift family rate)
     type: "sedan",
     transmission: "manual",
     fuel: "petrol",
@@ -106,11 +106,11 @@ export const carsData = [
   },
   {
     id: 6,
-    make: "Hyundai",
-    model: "i20",
-    year: 2022,
+    make: "Toyota",
+    model: "Etios",
+    year: 2017,
     price: 11,
-    perKmRate: 13, // i20 rate 13rs/km
+    perKmRate: 13, // Etios rate 13rs/km
     type: "hatchback",
     transmission: "manual",
     fuel: "petrol",
@@ -119,7 +119,7 @@ export const carsData = [
     reviews: 167,
     location: "Jaipur",
     features: ["Compact", "City Drive", "Easy Parking", "Good Mileage"],
-    image: "https://stimg.cardekho.com/images/car-images/930x620/Hyundai/i20/11093/1758102282831/Atlas-White_d5d5d5.jpg?tr=w-898?w=600&h=400&fit=crop",
+    image: "https://stimg.cardekho.com/images/car-images/large/Toyota/Toyota-Etios/white.jpg?tr=w-898?w=600&h=400&fit=crop",
     availability: true,
     description: "Perfect for city travel. Easy handling in traffic.",
     driverIncluded: true,
@@ -148,6 +148,27 @@ export const carsData = [
   },
   {
     id: 8,
+    make: "Maruti Suzuki",
+    model: "Swift",
+    year: 2023,
+    price: 11,
+    perKmRate: 12, 
+    type: "hatchback",
+    transmission: "manual",
+    fuel: "petrol",
+    seats: 5,
+    rating: 4.5,
+    reviews: 192,
+    location: "Jaipur",
+    features: ["AC", "Music System", "Spacious Interior", "Fuel Efficient"],
+    image: "https://stimg.cardekho.com/images/car-images/930x620/Maruti/Swift/9226/1747045535143/230_Pearl-Arctic-White_e8e8e8.jpg?tr=w-898?w=600&h=400&fit=crop",
+    availability: true,
+    description: "Popular premium hatchback with excellent fuel efficiency and modern features.",
+    driverIncluded: true,
+    route: "City/Local/Short Distance"
+  },
+  {
+    id: 9,
     make: "Mahindra",
     model: "Scorpio N",
     year: 2023,

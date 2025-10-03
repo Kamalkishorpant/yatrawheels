@@ -25,6 +25,7 @@ const Hero = ({ onSearch }) => {
   }))
 
   const onSubmit = async (data) => {
+    console.log('Form submission started:', data) // Debug log
     setIsSubmitting(true)
     setSubmitMessage('')
 
@@ -44,13 +45,17 @@ Special Requirements: ${data.requirements || 'None'}`,
         stage_id: 1, // New lead stage
       }
 
+      console.log('Sending lead data:', leadData) // Debug log
       const result = await odooAPI.createLead(leadData)
+      console.log('API result:', result) // Debug log
       
       if (result) {
         setSubmitMessage('Thank you! Your travel inquiry has been submitted successfully. We will contact you soon.')
         reset()
         setPickupDate(null)
         setReturnDate(null)
+        // Clear message after 5 seconds
+        setTimeout(() => setSubmitMessage(''), 5000)
       } else {
         // Store in localStorage as fallback
         const failedInquiries = JSON.parse(localStorage.getItem('failedInquiries') || '[]')
@@ -58,13 +63,18 @@ Special Requirements: ${data.requirements || 'None'}`,
         localStorage.setItem('failedInquiries', JSON.stringify(failedInquiries))
         
         setSubmitMessage('Your inquiry has been saved. We will process it and contact you soon.')
+        // Clear message after 5 seconds
+        setTimeout(() => setSubmitMessage(''), 5000)
       }
     } catch (error) {
       console.error('Inquiry submission error:', error)
       setSubmitMessage('Your inquiry has been saved locally. We will contact you soon.')
+      // Clear message after 5 seconds
+      setTimeout(() => setSubmitMessage(''), 5000)
     }
 
     setIsSubmitting(false)
+    console.log('Form submission completed') // Debug log
   }
 
   return (
@@ -87,6 +97,28 @@ Special Requirements: ${data.requirements || 'None'}`,
         </motion.p>
 
         <motion.div 
+          className="priority-banner"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <div className="priority-message">
+            <span className="priority-icon">👩‍🦳</span>
+            <strong>Special Priority:</strong> Women & Senior Citizens get preference in booking
+            <span className="priority-icon">👵</span>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="highlighted-quote"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.35 }}
+        >
+          <p>"आपकी सुरक्षा, हमारी प्राथमिकता - Your Safety, Our Priority"</p>
+        </motion.div>
+
+        <motion.div 
           className="search-form-container"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -101,8 +133,8 @@ Special Requirements: ${data.requirements || 'None'}`,
           )}
           
           <form onSubmit={handleSubmit(onSubmit)} className="inquiry-form">
-            <div className="form-group full-width">
-              <User className="form-icon" size={20} />
+            <div className="form-group half-width">
+              <User className="form-icon" size={18} />
               <input
                 {...register('customerName', { required: true })}
                 type="text"
@@ -111,8 +143,8 @@ Special Requirements: ${data.requirements || 'None'}`,
               />
             </div>
 
-            <div className="form-group full-width">
-              <Phone className="form-icon" size={20} />
+            <div className="form-group half-width">
+              <Phone className="form-icon" size={18} />
               <input
                 {...register('phone', { required: true })}
                 type="tel"
@@ -121,103 +153,92 @@ Special Requirements: ${data.requirements || 'None'}`,
               />
             </div>
 
-            <div className="form-divider"></div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <MapPin className="form-icon" size={20} />
-                <Select
-                  options={locationOptions}
-                  placeholder="Pick-up City *"
-                  className="location-select"
-                  classNamePrefix="select"
-                  onChange={(option) => setValue('pickupLocation', option)}
-                  value={watchedPickupLocation}
-                />
-              </div>
-
-              <div className="form-group">
-                <MapPin className="form-icon" size={20} />
-                <Select
-                  options={locationOptions}
-                  placeholder="Drop City *"
-                  className="location-select"
-                  classNamePrefix="select"
-                  onChange={(option) => setValue('dropLocation', option)}
-                  value={watchedDropLocation}
-                />
-              </div>
+            <div className="form-group half-width">
+              <MapPin className="form-icon" size={18} />
+              <Select
+                options={locationOptions}
+                placeholder="Pick-up City *"
+                className="location-select"
+                classNamePrefix="select"
+                onChange={(option) => setValue('pickupLocation', option)}
+                value={watchedPickupLocation}
+              />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <Calendar className="form-icon" size={20} />
-                <DatePicker
-                  selected={pickupDate}
-                  onChange={(date) => setPickupDate(date)}
-                  placeholderText="Travel Date *"
-                  className="date-input"
-                  minDate={new Date()}
-                />
-              </div>
-
-              <div className="form-group">
-                <Calendar className="form-icon" size={20} />
-                <DatePicker
-                  selected={returnDate}
-                  onChange={(date) => setReturnDate(date)}
-                  placeholderText="Return Date (Optional)"
-                  className="date-input"
-                  minDate={pickupDate || new Date()}
-                />
-              </div>
+            <div className="form-group half-width">
+              <MapPin className="form-icon" size={18} />
+              <Select
+                options={locationOptions}
+                placeholder="Drop City *"
+                className="location-select"
+                classNamePrefix="select"
+                onChange={(option) => setValue('dropLocation', option)}
+                value={watchedDropLocation}
+              />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <Select
-                  options={carTypes}
-                  placeholder="Vehicle Type *"
-                  className="car-type-select"
-                  classNamePrefix="select"
-                  onChange={(option) => setValue('carType', option)}
-                  value={watchedCarType}
-                />
-              </div>
+            <div className="form-group half-width">
+              <Calendar className="form-icon" size={18} />
+              <DatePicker
+                selected={pickupDate}
+                onChange={(date) => setPickupDate(date)}
+                placeholderText="Travel Date *"
+                className="date-input"
+                minDate={new Date()}
+              />
+            </div>
 
-              <div className="form-group">
-                <input
-                  {...register('email')}
-                  type="email"
-                  placeholder="Email (Optional)"
-                  className="form-input"
-                />
-              </div>
+            <div className="form-group half-width">
+              <Calendar className="form-icon" size={18} />
+              <DatePicker
+                selected={returnDate}
+                onChange={(date) => setReturnDate(date)}
+                placeholderText="Return Date (Optional)"
+                className="date-input"
+                minDate={pickupDate || new Date()}
+              />
+            </div>
+
+            <div className="form-group half-width">
+              <Select
+                options={carTypes}
+                placeholder="Vehicle Type *"
+                className="location-select"
+                classNamePrefix="select"
+                onChange={(option) => setValue('carType', option)}
+                value={watchedCarType}
+              />
+            </div>
+            <div className="form-group half-width">
+              <input
+                {...register('email')}
+                type="email"
+                placeholder="Email (Optional)"
+                className="form-input"
+              />
             </div>
 
             <div className="form-group full-width">
-              <MessageSquare className="form-icon" size={20} />
+              <MessageSquare className="form-icon" size={18} />
               <textarea
                 {...register('requirements')}
                 placeholder="Special Requirements (Optional)"
                 className="form-textarea"
-                rows="3"
+                rows="2"
               />
             </div>
 
-            <div className="charges-note">
-              <p><strong>Note:</strong> Rates displayed are base charges per km. Night charges (10 PM - 6 AM) and toll charges are additional and will be added to the final bill.</p>
+            <div className="form-group full-width">
+              <motion.button 
+                type="submit" 
+                className="inquiry-btn"
+                disabled={isSubmitting}
+                whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
+                whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
+              >
+                {isSubmitting ? 'Submitting...' : 'Get Quote & Book Now'}
+              </motion.button>
             </div>
-
-            <motion.button 
-              type="submit" 
-              className="inquiry-btn"
-              disabled={isSubmitting}
-              whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
-              whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
-            >
-              {isSubmitting ? 'Submitting...' : 'Get Quote & Book Now'}
-            </motion.button>
           </form>
         </motion.div>
       </div>

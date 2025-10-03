@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
-import Hero from './components/Hero'
-import FeaturedCars from './components/FeaturedCars'
-import Testimonials from './components/Testimonials'
 import Footer from './components/Footer'
 import BookingModal from './components/BookingModal'
 import InquiryModal from './components/InquiryModal'
 import { carsData } from './data/carsData'
 import vehicleSyncService from './services/vehicleSync'
+
+// Import page components
+import HomePage from './pages/HomePage'
+import OurFleetPage from './pages/OurFleetPage'
+import ServicesPage from './pages/ServicesPage'
+import AboutPage from './pages/AboutPage'
+import ContactPage from './pages/ContactPage'
 
 function App() {
   const [cars, setCars] = useState(carsData)
@@ -110,16 +114,11 @@ function App() {
         )}
         
         <Routes>
-          <Route path="/" element={
-            <>
-              <main id="main-content">
-                <Hero onSearch={handleSearch} />
-                <FeaturedCars cars={filteredCars} onBookCar={handleBookCar} />
-                <Testimonials />
-              </main>
-            </>
-          } />
-          <Route path="/contact" element={<React.Suspense fallback={<div>Loading...</div>}><div style={{padding:20}}><h2>Contact Us</h2></div></React.Suspense>} />
+          <Route path="/" element={<HomePage cars={filteredCars} onBookCar={handleBookCar} onSearch={handleSearch} />} />
+          <Route path="/fleet" element={<OurFleetPage cars={filteredCars} onBookCar={handleBookCar} />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/special-request" element={<React.Suspense fallback={<div>Loading...</div>}><div style={{padding:20}}><h2>Special Request</h2></div></React.Suspense>} />
         </Routes>
         <Footer />
